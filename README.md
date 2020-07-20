@@ -1,6 +1,6 @@
 # MotoduinoWiFi
 
-Motoduino WiFi Terminal Test.
+Motoduino's WiFi Terminal Service.
 
 ## License
 
@@ -12,5 +12,5 @@ MIT
 (The metadata above is needed for package search.)
 
 ```package
-MotoduinoWiFi=github:motoMarkHsu/pxt-MotoduinoWiFi
+MotoduinoWiFi=github:Motoduino/pxt-MotoduinoWiFi
 ```
