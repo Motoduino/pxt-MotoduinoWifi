@@ -158,7 +158,7 @@ namespace MotoduinoWiFi {
 	
     export function LINENotify_Service(szToken: string, szMsg: string): void {
         let szMsgData: string = "message="+szMsg+"\u000D\u000A"
-		let nMsgDataLen: number = szMsgData.length + 2
+        let nMsgDataLen: number = szMsgData.length + 2
         let SendLINECommand = "POST /api/notify HTTP/1.1\u000D\u000AHost: notify-api.line.me\u000D\u000AAuthorization: Bearer "+szToken+"\u000D\u000AContent-Type: application/x-www-form-urlencoded\u000D\u000AContent-Length: "+nMsgDataLen+"\u000D\u000A\u000D\u000A"+szMsgData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (SendLINECommand.length + 2)
 		
