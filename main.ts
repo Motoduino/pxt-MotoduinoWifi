@@ -155,8 +155,6 @@ namespace MotoduinoWiFi {
     //% blockId=LINENotify_Service
     //% weight=35
     //% block="LINE Notify Service| LINE Token %szToken| LINE Message %szMsg"
-    //% szToken.defl="wVBbtiNY0gmfU2mA9UWePztgL4XSTfQ48UJqmCeZcu0"
-    //% szMsg.defl="Hello, LINE Notify!"
 	
     export function LINENotify_Service(szToken: string, szMsg: string): void {
         let szMsgData: string = "message="+szMsg+"\u000D\u000A"
