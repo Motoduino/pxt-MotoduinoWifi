@@ -21,7 +21,6 @@ namespace MotoduinoWiFi {
         let time: number = input.runningTime()
         while (true) {
             serial_str += serial.readString()
-			//sendAT(serial_str)
             if (serial_str.length > 200) {
                 serial_str = serial_str.substr(serial_str.length - 200)
             }
@@ -31,11 +30,10 @@ namespace MotoduinoWiFi {
             } else if (serial_str.includes("ERROR") || serial_str.includes("SEND FAIL")) {
                 break
             }
-            if (input.runningTime() - time > 5000) {
+            if (input.runningTime() - time > 10000) {
                 break
             }
         }
-		//sendAT("Done")
         return result
     }
 
@@ -62,7 +60,7 @@ namespace MotoduinoWiFi {
         sendAT("AT+RST")
     	sendAT("AT+CWMODE_CUR=1")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
-        //bAP_Connected = waitResponse()
+        bAP_Connected = waitResponse()
     	basic.pause(3000)
     }
 
@@ -72,11 +70,11 @@ namespace MotoduinoWiFi {
     */
     //% blockId=Check_WiFiConnect
     //% weight=90
-    //% block="Check WiFiConnect"
+    //% block="WiFi Connected?"
 	
-    /*export function Check_WiFiConnect(): boolean {
+    export function Check_WiFiConnect(): boolean {
         return bAP_Connected
-    }*/
+    }
 	
 	
     //% blockId=ThingSpeak_Uploader
@@ -165,7 +163,7 @@ namespace MotoduinoWiFi {
         sendAT("AT+CIPSSLSIZE=4096") 
         sendAT("AT+CIPSTART=\"SSL\",\"notify-api.line.me\",443", 3000)
         sendAT(ATCommand)
-        sendAT(SendLINECommand, 3000)
+        sendAT(SendLINECommand, 1000)
         sendAT("AT+CIPCLOSE")
     }
 }
