@@ -38,30 +38,34 @@ namespace MotoduinoWiFi {
     }
 
 	
+    export enum WiFiPinGroup {
+        //% block="TX:P1, RX:P2"
+        WiFiPinGroup_1 = 1
+    }	
     /**
     * Set Motoduino WIFI Terminal 
-    * @param txd Iot module to micro:bit ; eg: SerialPin.P15
-    * @param rxd micro:bit to Iot module ; eg: SerialPin.P8
     */
     //% blockId=Wifi_Setup
     //% weight=100
-    //% block="Motoduino WIFI Set| Tx_Pin %txd| Rx_Pin %rxd| SSID %ssid| PASSWORD %passwd"
-    //% txd.defl=SerialPin.P13
-    //% rxd.defl=SerialPin.P14
+    //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
     //% ssid.defl="Your_SSID"
     //% passwd.defl="Your_Password"
 	
-    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
+    export function Wifi_Setup(wifiPins: WiFiPinGroup, ssid: string, passwd: string): void {
 
         bAP_Connected = false
-        bThingSpeak_Connected = false
 		
-        serial.redirect(txd, rxd, BaudRate.BaudRate9600)
+        if(wifiPins == 1) {
+            serial.redirect(SerialPin.P1, SerialPin.P2, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 2) {
+        }
+        else {
+        }
         sendAT("AT+RST")
     	sendAT("AT+CWMODE_CUR=1")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
-        bAP_Connected = waitResponse()
-    	basic.pause(3000)
+		bAP_Connected = waitResponse()
     }
 
 
