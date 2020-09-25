@@ -188,32 +188,31 @@ namespace MotoduinoWiFi {
 		
 		if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
 		{
-			//basic.showNumber(3)
 			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + ",\"" + szFirebaseID3 + "\":" + szUpdateData3 + "}" + "\u000D\u000A"
 		}
 		else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
 		{
-			//basic.showNumber(2)
 			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + "}" + "\u000D\u000A"
 		}
 		else if(szFirebaseID1.indexOf("undefined")<0)
 		{
-			//basic.showNumber(1)
 			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + "}" + "\u000D\u000A"
 		}
 		else
 		{
-			//basic.showNumber(0)
 			return
 		}
 		
 		let nFirebaseDataLen: number = szFirebaseData.length + 2
+		let szUploadMethod: string=""
 		if(uploadMethod == 1)
-			FirebaseUploadCommand = "PUT /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+			szUploadMethod = "PUT"
 		if(uploadMethod == 2)
-			FirebaseUploadCommand = "POST /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+			szUploadMethod = "POST"
 		if(uploadMethod == 3)
-			FirebaseUploadCommand = "PATCH /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+			szUploadMethod = "PATCH"
+			
+		FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (FirebaseUploadCommand.length + 2)
 		
         sendAT("AT+CIPSSLSIZE=4096") 
