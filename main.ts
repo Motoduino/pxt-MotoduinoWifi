@@ -189,17 +189,17 @@ namespace MotoduinoWiFi {
 		if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
 		{
 			//basic.showNumber(3)
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\",\"" + szFirebaseID3 + "\":\"" + szUpdateData3 + "\"}" + "\u000D\u000A"
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + ",\"" + szFirebaseID3 + "\":" + szUpdateData3 + "}" + "\u000D\u000A"
 		}
 		else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
 		{
 			//basic.showNumber(2)
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\"}" + "\u000D\u000A"
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + "}" + "\u000D\u000A"
 		}
 		else if(szFirebaseID1.indexOf("undefined")<0)
 		{
 			//basic.showNumber(1)
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\"}" + "\u000D\u000A"
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + "}" + "\u000D\u000A"
 		}
 		else
 		{
