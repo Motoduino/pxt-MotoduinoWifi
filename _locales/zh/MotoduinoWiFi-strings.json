@@ -6,5 +6,5 @@
     "MotoduinoWiFi.IFTTT_Service|block": "IFTTT雲端服務| 授權碼(KEY) %apikey| 事件名稱(Event Name) %eventName| 數值1 (Value1) %v1| 數值2 (Value2) %v2| 數值3 (Value3) %v3",
     "MotoduinoWiFi.GoogleForm_Service|block": "Google表單服務| 寫入授權碼(KEY) %apikey| 欄位ID1 (Entry ID1) %entryID1| 資料1 (Value1) %d1|| 欄位ID2 (Entry ID2) %entryID2| 資料2 (Value2) %d2| 欄位ID3 (Entry ID3) %entryID3| 資料3 (Value3) %d3",
     "MotoduinoWiFi.LINENotify_Service|block": "LINE Notify通知服務| 授權碼(Token) %szToken| LINE訊息 %szMsg",
-    "MotoduinoWiFi.Firebase_Uploader|block": "Firebase上傳服務| 上傳方式(Method) %uploadMethod| 網址(URL) %szFirebaseURL| 授權碼(KEY) %szFirebaseKey| 節點(Path) %szFirebasePath| ID1名稱 %szFirebaseID1| 資料1 (Data1) %szUpdateData1|| ID2名稱 %szFirebaseID2| 資料2 (Data2) %szUpdateData2| ID3名稱 %szFirebaseID3| 資料3 (Data3) %szUpdateData3"
+    "MotoduinoWiFi.Firebase_Uploader|block": "Firebase上傳服務| 上傳方式(Method) %uploadMethod| 網址(URL) %szFirebaseURL| 資料庫密鑰(Secret Key) %szFirebaseKey| 節點(Path) %szFirebasePath| ID1名稱 %szFirebaseID1| 資料1 (Data1) %szUpdateData1|| ID2名稱 %szFirebaseID2| 資料2 (Data2) %szUpdateData2| ID3名稱 %szFirebaseID3| 資料3 (Data3) %szUpdateData3"
 }
