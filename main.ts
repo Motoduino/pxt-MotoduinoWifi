@@ -181,7 +181,6 @@ namespace MotoduinoWiFi {
     //% weight=30
     //% block="Firebase Data Upload| Upload Method %uploadMethod| URL %szFirebaseURL| Key %szFirebaseKey| Path %szFirebasePath| ID 1 %szFirebaseID1| Data 1 %szUpdateData1|| ID 2 %szFirebaseID2| Data 2 %szUpdateData2| ID 3 %szFirebaseID3| Data 3 %szUpdateData3"
     //% szFirebaseURL.defl="xxxxxxx.firebaseio.com"
-    //% szFirebaseKey.defl=""
 	
     export function Firebase_Uploader(uploadMethod: FirebaseUploadMethod, szFirebaseURL: string, szFirebaseKey: string, szFirebasePath: string, szFirebaseID1: string, szUpdateData1: number, szFirebaseID2?: string, szUpdateData2?: number, szFirebaseID3?: string, szUpdateData3?: number): void {
         let szFirebaseData: string = ""
@@ -203,7 +202,10 @@ namespace MotoduinoWiFi {
 			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\"}" + "\u000D\u000A"
 		}
 		else
+		{
+			//basic.showNumber(0)
 			return
+		}
 		
 		let nFirebaseDataLen: number = szFirebaseData.length + 2
 		if(uploadMethod == 1)
