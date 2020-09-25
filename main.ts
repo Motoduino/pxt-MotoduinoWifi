@@ -48,11 +48,8 @@ namespace MotoduinoWiFi {
     //% blockId=Wifi_Setup
     //% weight=100
     //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
-    //% ssid.defl="Your_SSID"
-    //% passwd.defl="Your_Password"
 	
     export function Wifi_Setup(wifiPins: WiFiPinGroup, ssid: string, passwd: string): void {
-
         bAP_Connected = false
 		
         if(wifiPins == 1) {
@@ -168,6 +165,59 @@ namespace MotoduinoWiFi {
         sendAT("AT+CIPSTART=\"SSL\",\"notify-api.line.me\",443", 3000)
         sendAT(ATCommand)
         sendAT(SendLINECommand, 1000)
+        sendAT("AT+CIPCLOSE")
+    }
+	
+	
+	export enum FirebaseUploadMethod {
+		//% block="PUT"
+        FirebaseUploadMethod_1 = 1,
+		//% block="POST"
+		FirebaseUploadMethod_2 = 2,
+		//% block="PATCH"
+		FirebaseUploadMethod_3 = 3
+    }	
+	//% blockId=Firebase_Uploader
+    //% weight=30
+    //% block="Firebase Data Upload| Upload Method %uploadMethod| URL %szFirebaseURL| Key %szFirebaseKey| Path %szFirebasePath| ID 1 %szFirebaseID1| Data 1 %szUpdateData1|| ID 2 %szFirebaseID2| Data 2 %szUpdateData2| ID 3 %szFirebaseID3| Data 3 %szUpdateData3"
+    //% szFirebaseURL.defl="xxxxxxx.firebaseio.com"
+    //% szFirebaseKey.defl=""
+	
+    export function Firebase_Uploader(uploadMethod: FirebaseUploadMethod, szFirebaseURL: string, szFirebaseKey: string, szFirebasePath: string, szFirebaseID1: string, szUpdateData1: number, szFirebaseID2?: string, szUpdateData2?: number, szFirebaseID3?: string, szUpdateData3?: number): void {
+        let szFirebaseData: string = ""
+		let FirebaseUploadCommand: string = ""
+		
+		if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
+		{
+			//basic.showNumber(3)
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\",\"" + szFirebaseID3 + "\":\"" + szUpdateData3 + "\"}" + "\u000D\u000A"
+		}
+		else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
+		{
+			//basic.showNumber(2)
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\"}" + "\u000D\u000A"
+		}
+		else if(szFirebaseID1.indexOf("undefined")<0)
+		{
+			//basic.showNumber(1)
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\"}" + "\u000D\u000A"
+		}
+		else
+			return
+		
+		let nFirebaseDataLen: number = szFirebaseData.length + 2
+		if(uploadMethod == 1)
+			FirebaseUploadCommand = "PUT /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+		if(uploadMethod == 2)
+			FirebaseUploadCommand = "POST /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+		if(uploadMethod == 3)
+			FirebaseUploadCommand = "PATCH /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+        let ATCommand = "AT+CIPSEND=" + (FirebaseUploadCommand.length + 2)
+		
+        sendAT("AT+CIPSSLSIZE=4096") 
+        sendAT("AT+CIPSTART=\"SSL\",\""+szFirebaseURL+"\",443", 3000)
+        sendAT(ATCommand)
+        sendAT(FirebaseUploadCommand,3000)
         sendAT("AT+CIPCLOSE")
     }
 }
