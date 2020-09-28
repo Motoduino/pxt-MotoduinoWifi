@@ -40,7 +40,19 @@ namespace MotoduinoWiFi {
 	
     export enum WiFiPinGroup {
         //% block="TX:P1, RX:P2"
-        WiFiPinGroup_1 = 1
+        WiFiPinGroup_1 = 1,
+        //% block="TX:P13, RX:P14"
+        WiFiPinGroup_2 = 2,
+        //% block="TX:P13, RX:P15"
+        WiFiPinGroup_3 = 3,
+        //% block="TX:P13, RX:P16"
+        WiFiPinGroup_4 = 4,
+        //% block="TX:P14, RX:P15"
+        WiFiPinGroup_5 = 5,
+        //% block="TX:P14, RX:P16"
+        WiFiPinGroup_6 = 6,
+        //% block="TX:P15, RX:P16"
+        WiFiPinGroup_7 = 7
     }	
     /**
     * Set Motoduino WIFI Terminal 
@@ -56,8 +68,22 @@ namespace MotoduinoWiFi {
             serial.redirect(SerialPin.P1, SerialPin.P2, BaudRate.BaudRate9600)
         }
         else if(wifiPins == 2) {
+            serial.redirect(SerialPin.P13, SerialPin.P14, BaudRate.BaudRate9600)
         }
-        else {
+        else if(wifiPins == 3) {
+            serial.redirect(SerialPin.P13, SerialPin.P15, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 4) {
+            serial.redirect(SerialPin.P13, SerialPin.P16, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 5) {
+            serial.redirect(SerialPin.P14, SerialPin.P15, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 6) {
+            serial.redirect(SerialPin.P14, SerialPin.P16, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 7) {
+            serial.redirect(SerialPin.P15, SerialPin.P16, BaudRate.BaudRate9600)
         }
         sendAT("AT+RST")
     	sendAT("AT+CWMODE_CUR=1")
