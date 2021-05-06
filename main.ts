@@ -36,24 +36,6 @@ namespace MotoduinoWiFi {
         }
         return result
     }
-
-	
-    export enum WiFiPinGroup {
-        //% block="TX:P1, RX:P2"
-        WiFiPinGroup_1 = 1,
-        //% block="TX:P13, RX:P14"
-        WiFiPinGroup_2 = 2,
-        //% block="TX:P13, RX:P15"
-        WiFiPinGroup_3 = 3,
-        //% block="TX:P13, RX:P16"
-        WiFiPinGroup_4 = 4,
-        //% block="TX:P14, RX:P15"
-        WiFiPinGroup_5 = 5,
-        //% block="TX:P14, RX:P16"
-        WiFiPinGroup_6 = 6,
-        //% block="TX:P15, RX:P16"
-        WiFiPinGroup_7 = 7
-    }	
     /**
     * Set Motoduino WIFI Terminal 
     */
