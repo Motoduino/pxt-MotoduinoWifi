@@ -38,55 +38,29 @@ namespace MotoduinoWiFi {
     }
 
 	
-    export enum WiFiPinGroup {
-        //% block="TX:P1, RX:P2"
-        WiFiPinGroup_1 = 1,
-        //% block="TX:P13, RX:P14"
-        WiFiPinGroup_2 = 2,
-        //% block="TX:P13, RX:P15"
-        WiFiPinGroup_3 = 3,
-        //% block="TX:P13, RX:P16"
-        WiFiPinGroup_4 = 4,
-        //% block="TX:P14, RX:P15"
-        WiFiPinGroup_5 = 5,
-        //% block="TX:P14, RX:P16"
-        WiFiPinGroup_6 = 6,
-        //% block="TX:P15, RX:P16"
-        WiFiPinGroup_7 = 7
-    }	
     /**
     * Set Motoduino WIFI Terminal 
     */
     //% blockId=Wifi_Setup
     //% weight=100
-    //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
+    //% block="Motoduino WIFI Set| Tx_Pin %txd| Rx_Pin %rxd| SSID %ssid| PASSWORD %passwd"
+    //% txd.defl=SerialPin.P13
+    //% rxd.defl=SerialPin.P14
+    //% ssid.defl="Your_SSID"
+    //% passwd.defl="Your_Password"
 	
-    export function Wifi_Setup(wifiPins: WiFiPinGroup, ssid: string, passwd: string): void {
+    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
         bAP_Connected = false
 		
-        if(wifiPins == 1) {
-            serial.redirect(SerialPin.P1, SerialPin.P2, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 2) {
-            serial.redirect(SerialPin.P13, SerialPin.P14, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 3) {
-            serial.redirect(SerialPin.P13, SerialPin.P15, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 4) {
-            serial.redirect(SerialPin.P13, SerialPin.P16, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 5) {
-            serial.redirect(SerialPin.P14, SerialPin.P15, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 6) {
-            serial.redirect(SerialPin.P14, SerialPin.P16, BaudRate.BaudRate9600)
-        }
-        else if(wifiPins == 7) {
-            serial.redirect(SerialPin.P15, SerialPin.P16, BaudRate.BaudRate9600)
-        }
+        serial.redirect(txd, rxd, BaudRate.BaudRate9600)
         sendAT("AT+RST")
+        sendAT("ATE0")
     	sendAT("AT+CWMODE_CUR=1")
+        sendAT("AT+CIPDINFO=1")
+        sendAT("AT+CWAUTOCONN=0")
+        sendAT("AT+CWDHCP=1,1")
+        sendAT("AT+GMR")
+		sendAT("AT+CIPSTATUS")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
 		bAP_Connected = waitResponse()
     }
@@ -203,7 +177,7 @@ namespace MotoduinoWiFi {
 		//% block="PATCH"
 		FirebaseUploadMethod_3 = 3
     }	
-	//% blockId=Firebase_Uploader
+    //% blockId=Firebase_Uploader
     //% weight=30
     //% block="Firebase Data Upload| Upload Method %uploadMethod| URL %szFirebaseURL| Key %szFirebaseKey| Path %szFirebasePath| ID 1 %szFirebaseID1| Data 1 %szUpdateData1|| ID 2 %szFirebaseID2| Data 2 %szUpdateData2| ID 3 %szFirebaseID3| Data 3 %szUpdateData3"
     //% szFirebaseURL.defl="xxxxxxx.firebaseio.com"
