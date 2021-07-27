@@ -43,13 +43,9 @@ namespace MotoduinoWiFi {
     //% weight=100
     //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
 	
-    export function Wifi_Setup(tx: SerialPin, rx: SerialPin,ssid: string, passwd: string): void {
+    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
         bAP_Connected = false
-	    serial.redirect(
-            tx,
-            rx,
-            BaudRate.BaudRate9600
-        )
+		serial.redirect(txd, rxd, BaudRate.BaudRate9600)
         sendAT("AT+RST")
     	sendAT("AT+CWMODE_CUR=1")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
