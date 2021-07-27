@@ -36,18 +36,31 @@ namespace MotoduinoWiFi {
         }
         return result
     }
+
+	
     /**
     * Set Motoduino WIFI Terminal 
     */
     //% blockId=Wifi_Setup
     //% weight=100
-    //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
+    //% block="Motoduino WIFI Set| Tx_Pin %txd| Rx_Pin %rxd| SSID %ssid| PASSWORD %passwd"
+    //% txd.defl=SerialPin.P15
+    //% rxd.defl=SerialPin.P8
+    //% ssid.defl="Your_SSID"
+    //% passwd.defl="Your_Password"
 	
     export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
         bAP_Connected = false
-		serial.redirect(txd, rxd, BaudRate.BaudRate9600)
+		
+        serial.redirect(txd, rxd, BaudRate.BaudRate9600)
         sendAT("AT+RST")
+        sendAT("ATE0")
     	sendAT("AT+CWMODE_CUR=1")
+        sendAT("AT+CIPDINFO=1")
+        sendAT("AT+CWAUTOCONN=0")
+        sendAT("AT+CWDHCP=1,1")
+        sendAT("AT+GMR")
+		sendAT("AT+CIPSTATUS")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
 		bAP_Connected = waitResponse()
     }
@@ -164,7 +177,7 @@ namespace MotoduinoWiFi {
 		//% block="PATCH"
 		FirebaseUploadMethod_3 = 3
     }	
-	//% blockId=Firebase_Uploader
+    //% blockId=Firebase_Uploader
     //% weight=30
     //% block="Firebase Data Upload| Upload Method %uploadMethod| URL %szFirebaseURL| Key %szFirebaseKey| Path %szFirebasePath| ID 1 %szFirebaseID1| Data 1 %szUpdateData1|| ID 2 %szFirebaseID2| Data 2 %szUpdateData2| ID 3 %szFirebaseID3| Data 3 %szUpdateData3"
     //% szFirebaseURL.defl="xxxxxxx.firebaseio.com"
