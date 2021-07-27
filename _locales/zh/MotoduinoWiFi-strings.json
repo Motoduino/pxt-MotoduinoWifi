@@ -1,7 +1,7 @@
 {
     "MotoduinoWiFi|block": "慧手科技IoT",
-    "MotoduinoWiFi.Wifi_Setup|block": "慧手ESP8266設定| 腳位 %wifiPins| 分享器名稱 %ssid| 分享器密碼 %passwd",
-	"MotoduinoWiFi.Check_WiFiConnect|block": "WiFI連線狀態",
+    "MotoduinoWiFi.Wifi_Setup|block": "慧手ESP8266設定| Tx腳位 %txd| Rx腳位 %rxd| 分享器名稱 %ssid| 分享器密碼 %passwd",
+    "MotoduinoWiFi.Check_WiFiConnect|block": "WiFI連線狀態",
     "MotoduinoWiFi.ThingSpeak_Uploader|block": "ThingSpeak上傳資料| 寫入授權碼(API Keys) %apikey| 欄位1 (Field1) %f1|| 欄位2 (Field2) %f2| 欄位3 (Field3) %f3| 欄位4 (Field4) %f4| 欄位5 (Field5) %f5| 欄位6 (Field6) %f6| 欄位7 (Field7) %f7| 欄位8 (Field8) %f8",
     "MotoduinoWiFi.IFTTT_Service|block": "IFTTT雲端服務| 授權碼(KEY) %apikey| 事件名稱(Event Name) %eventName| 數值1 (Value1) %v1| 數值2 (Value2) %v2| 數值3 (Value3) %v3",
     "MotoduinoWiFi.GoogleForm_Service|block": "Google表單服務| 寫入授權碼(KEY) %apikey| 欄位ID1 (Entry ID1) %entryID1| 資料1 (Value1) %d1|| 欄位ID2 (Entry ID2) %entryID2| 資料2 (Value2) %d2| 欄位ID3 (Entry ID3) %entryID3| 資料3 (Value3) %d3",
