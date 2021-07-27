@@ -133,20 +133,13 @@ namespace MotoduinoWiFi {
     //% block="Google Form Service| API Keys %apikey| Entry ID1 %entryID1| Data1 %d1|| Entry ID2 %entryID2| Data2 %d2| Entry ID3 %entryID3| Data3 %d3"
 	
     export function GoogleForm_Service(apikey: string, entryID1: string, d1: number, entryID2?: string, d2?: number, entryID3?: string, d3?: number): void {
-        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1+ "&entry."+ entryID2+ "="+ d2+ "&entry."+ entryID3+ "="+ d3+ "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
-        /*
-        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1
-        if(entryID2.length > 0) {
-            GoogleCommand += "&entry."+ entryID2+ "="+ d2
-        }
-        GoogleCommand += "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
-        */
+        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1+ "&entry."+ entryID2+ "="+ d2+ "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
         let ATCommand = "AT+CIPSEND=" + (GoogleCommand.length + 2)
 		
         sendAT("AT+CIPSSLSIZE=4096") 
         sendAT("AT+CIPSTART=\"SSL\",\"docs.google.com\",443", 3000)
         sendAT(ATCommand)
-        sendAT(GoogleCommand,1000)
+        sendAT(GoogleCommand,2000)
         sendAT("AT+CIPCLOSE")
     }
 		
