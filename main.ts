@@ -179,10 +179,10 @@ namespace MotoduinoWiFi {
         let szFirebaseData: string = ""
 	let FirebaseUploadCommand: string = ""
 		
-	if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
-	{
+	//if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
+	//{
 		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\",\"" + szFirebaseID3 + "\":\"" + szUpdateData3 + "\"}" + "\u000D\u000A"
-	}
+	/*}
 	else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
 	{
 		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\"}" + "\u000D\u000A"
@@ -194,7 +194,7 @@ namespace MotoduinoWiFi {
 	else
 	{
 		return
-	}
+	}*/
 		
 	let nFirebaseDataLen: number = szFirebaseData.length + 2
 	let szUploadMethod: string=""
