@@ -177,35 +177,35 @@ namespace MotoduinoWiFi {
 	
     export function Firebase_Uploader(uploadMethod: FirebaseUploadMethod, szFirebaseURL: string, szFirebaseKey: string, szFirebasePath: string, szFirebaseID1: string, szUpdateData1: number, szFirebaseID2?: string, szUpdateData2?: number, szFirebaseID3?: string, szUpdateData3?: number): void {
         let szFirebaseData: string = ""
-		let FirebaseUploadCommand: string = ""
+	let FirebaseUploadCommand: string = ""
 		
-		if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
-		{
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + ",\"" + szFirebaseID3 + "\":" + szUpdateData3 + "}" + "\u000D\u000A"
-		}
-		else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
-		{
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + "}" + "\u000D\u000A"
-		}
-		else if(szFirebaseID1.indexOf("undefined")<0)
-		{
-			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + "}" + "\u000D\u000A"
-		}
-		else
-		{
-			return
-		}
+	if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
+	{
+		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\",\"" + szFirebaseID3 + "\":\"" + szUpdateData3 + "\"}" + "\u000D\u000A"
+	}
+	else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
+	{
+		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\"}" + "\u000D\u000A"
+	}
+	else if(szFirebaseID1.indexOf("undefined")<0)
+	{
+		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\"}" + "\u000D\u000A"
+	}
+	else
+	{
+		return
+	}
 		
-		let nFirebaseDataLen: number = szFirebaseData.length + 2
-		let szUploadMethod: string=""
-		if(uploadMethod == 1)
-			szUploadMethod = "PUT"
-		if(uploadMethod == 2)
-			szUploadMethod = "POST"
-		if(uploadMethod == 3)
-			szUploadMethod = "PATCH"
+	let nFirebaseDataLen: number = szFirebaseData.length + 2
+	let szUploadMethod: string=""
+	if(uploadMethod == 1)
+		szUploadMethod = "PUT"
+	if(uploadMethod == 2)
+		szUploadMethod = "POST"
+	if(uploadMethod == 3)
+		szUploadMethod = "PATCH"
 			
-		FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+	FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (FirebaseUploadCommand.length + 2)
 		
         sendAT("AT+CIPSSLSIZE=4096") 
