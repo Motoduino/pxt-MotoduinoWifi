@@ -38,21 +38,53 @@ namespace MotoduinoWiFi {
     }
 
 	
+    export enum WiFiPinGroup {
+        //% block="TX:P1, RX:P2"
+        WiFiPinGroup_1 = 1,
+        //% block="TX:P13, RX:P14"
+        WiFiPinGroup_2 = 2,
+        //% block="TX:P13, RX:P15"
+        WiFiPinGroup_3 = 3,
+        //% block="TX:P13, RX:P16"
+        WiFiPinGroup_4 = 4,
+        //% block="TX:P14, RX:P15"
+        WiFiPinGroup_5 = 5,
+        //% block="TX:P14, RX:P16"
+        WiFiPinGroup_6 = 6,
+        //% block="TX:P15, RX:P16"
+        WiFiPinGroup_7 = 7
+    }	
     /**
     * Set Motoduino WIFI Terminal 
     */
     //% blockId=Wifi_Setup
     //% weight=100
-    //% block="Motoduino WIFI Set| Tx_Pin %txd| Rx_Pin %rxd| SSID %ssid| PASSWORD %passwd"
-    //% txd.defl=SerialPin.P15
-    //% rxd.defl=SerialPin.P8
-    //% ssid.defl="Your_SSID"
-    //% passwd.defl="Your_Password"
+    //% block="Motoduino WIFI Set| ESP8266 Pins %wifiPins| SSID %ssid| PASSWORD %passwd"
 	
-    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
+    export function Wifi_Setup(wifiPins: WiFiPinGroup, ssid: string, passwd: string): void {
         bAP_Connected = false
 		
-        serial.redirect(txd, rxd, BaudRate.BaudRate9600)
+        if(wifiPins == 1) {
+            serial.redirect(SerialPin.P1, SerialPin.P2, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 2) {
+            serial.redirect(SerialPin.P13, SerialPin.P14, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 3) {
+            serial.redirect(SerialPin.P13, SerialPin.P15, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 4) {
+            serial.redirect(SerialPin.P13, SerialPin.P16, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 5) {
+            serial.redirect(SerialPin.P14, SerialPin.P15, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 6) {
+            serial.redirect(SerialPin.P14, SerialPin.P16, BaudRate.BaudRate9600)
+        }
+        else if(wifiPins == 7) {
+            serial.redirect(SerialPin.P15, SerialPin.P16, BaudRate.BaudRate9600)
+        }
         sendAT("AT+RST")
         sendAT("ATE0")
     	sendAT("AT+CWMODE_CUR=1")
@@ -133,13 +165,20 @@ namespace MotoduinoWiFi {
     //% block="Google Form Service| API Keys %apikey| Entry ID1 %entryID1| Data1 %d1|| Entry ID2 %entryID2| Data2 %d2| Entry ID3 %entryID3| Data3 %d3"
 	
     export function GoogleForm_Service(apikey: string, entryID1: string, d1: number, entryID2?: string, d2?: number, entryID3?: string, d3?: number): void {
-        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1+ "&entry."+ entryID2+ "="+ d2+ "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
+        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1+ "&entry."+ entryID2+ "="+ d2+ "&entry."+ entryID3+ "="+ d3+ "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
+        /*
+        let GoogleCommand = "GET /forms/d/e/"+ apikey+ "/formResponse?entry."+ entryID1+ "="+ d1
+        if(entryID2.length > 0) {
+            GoogleCommand += "&entry."+ entryID2+ "="+ d2
+        }
+        GoogleCommand += "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
+        */
         let ATCommand = "AT+CIPSEND=" + (GoogleCommand.length + 2)
 		
         sendAT("AT+CIPSSLSIZE=4096") 
         sendAT("AT+CIPSTART=\"SSL\",\"docs.google.com\",443", 3000)
         sendAT(ATCommand)
-        sendAT(GoogleCommand,2000)
+        sendAT(GoogleCommand,1000)
         sendAT("AT+CIPCLOSE")
     }
 		
@@ -170,42 +209,42 @@ namespace MotoduinoWiFi {
 		//% block="PATCH"
 		FirebaseUploadMethod_3 = 3
     }	
-    //% blockId=Firebase_Uploader
+	//% blockId=Firebase_Uploader
     //% weight=30
     //% block="Firebase Data Upload| Upload Method %uploadMethod| URL %szFirebaseURL| Key %szFirebaseKey| Path %szFirebasePath| ID 1 %szFirebaseID1| Data 1 %szUpdateData1|| ID 2 %szFirebaseID2| Data 2 %szUpdateData2| ID 3 %szFirebaseID3| Data 3 %szUpdateData3"
     //% szFirebaseURL.defl="xxxxxxx.firebaseio.com"
 	
-    export function Firebase_Uploader(uploadMethod: FirebaseUploadMethod, szFirebaseURL: string, szFirebaseKey: string, szFirebasePath: string, szFirebaseID1: string, szUpdateData1: string, szFirebaseID2?: string, szUpdateData2?: string, szFirebaseID3?: string, szUpdateData3?: string): void {
+    export function Firebase_Uploader(uploadMethod: FirebaseUploadMethod, szFirebaseURL: string, szFirebaseKey: string, szFirebasePath: string, szFirebaseID1: string, szUpdateData1: number, szFirebaseID2?: string, szUpdateData2?: number, szFirebaseID3?: string, szUpdateData3?: number): void {
         let szFirebaseData: string = ""
-	let FirebaseUploadCommand: string = ""
+		let FirebaseUploadCommand: string = ""
 		
-	//if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
-	//{
-		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\",\"" + szFirebaseID3 + "\":\"" + szUpdateData3 + "\"}" + "\u000D\u000A"
-	/*}
-	else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
-	{
-		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\",\"" + szFirebaseID2 + "\":\"" + szUpdateData2 + "\"}" + "\u000D\u000A"
-	}
-	else if(szFirebaseID1.indexOf("undefined")<0)
-	{
-		szFirebaseData = "{\"" + szFirebaseID1 + "\":\"" + szUpdateData1 + "\"}" + "\u000D\u000A"
-	}
-	else
-	{
-		return
-	}*/
+		if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0 && szFirebaseID3.indexOf("undefined")<0)
+		{
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + ",\"" + szFirebaseID3 + "\":" + szUpdateData3 + "}" + "\u000D\u000A"
+		}
+		else if(szFirebaseID1.indexOf("undefined")<0 && szFirebaseID2.indexOf("undefined")<0)
+		{
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + ",\"" + szFirebaseID2 + "\":" + szUpdateData2 + "}" + "\u000D\u000A"
+		}
+		else if(szFirebaseID1.indexOf("undefined")<0)
+		{
+			szFirebaseData = "{\"" + szFirebaseID1 + "\":" + szUpdateData1 + "}" + "\u000D\u000A"
+		}
+		else
+		{
+			return
+		}
 		
-	let nFirebaseDataLen: number = szFirebaseData.length + 2
-	let szUploadMethod: string=""
-	if(uploadMethod == 1)
-		szUploadMethod = "PUT"
-	if(uploadMethod == 2)
-		szUploadMethod = "POST"
-	if(uploadMethod == 3)
-		szUploadMethod = "PATCH"
+		let nFirebaseDataLen: number = szFirebaseData.length + 2
+		let szUploadMethod: string=""
+		if(uploadMethod == 1)
+			szUploadMethod = "PUT"
+		if(uploadMethod == 2)
+			szUploadMethod = "POST"
+		if(uploadMethod == 3)
+			szUploadMethod = "PATCH"
 			
-	FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
+		FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: "+nFirebaseDataLen+"\u000D\u000A\u000D\u000A"+szFirebaseData+"\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (FirebaseUploadCommand.length + 2)
 		
         sendAT("AT+CIPSSLSIZE=4096") 
