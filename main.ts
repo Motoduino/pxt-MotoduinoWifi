@@ -86,13 +86,7 @@ namespace MotoduinoWiFi {
             serial.redirect(SerialPin.P15, SerialPin.P16, BaudRate.BaudRate9600)
         }
         sendAT("AT+RST")
-        sendAT("ATE0")
     	sendAT("AT+CWMODE_CUR=1")
-        sendAT("AT+CIPDINFO=1")
-        sendAT("AT+CWAUTOCONN=0")
-        sendAT("AT+CWDHCP=1,1")
-        sendAT("AT+GMR")
-		sendAT("AT+CIPSTATUS")
     	sendAT("AT+CWJAP_CUR=\"" + ssid + "\",\"" + passwd + "\"", 0)
 		bAP_Connected = waitResponse()
     }
