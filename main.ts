@@ -1,31 +1,41 @@
 /**
- * Custom blocks
+ * ESP8266 blocks
  */
 //% color=#00bc11 icon="\uf1eb" weight=90 block="MotoduinoIoT"
 
 namespace MotoduinoWiFi {
     let onReceivedValueHandler: (topic: string, value: string) => void;
-    let mqtt_data:string
-    let bAP_Connected: boolean = false
+    let mqtt_data: string
+    let bAP_Connected: number=-1
     let bThingSpeak_Connected: boolean = false
     let bMQTT_SUB: boolean = false
     // write AT command with CR+LF ending
     function sendAT(command: string, wait: number = 100) {
+        let check: number
         serial.writeString(command + "\u000D\u000A")
-        basic.pause(wait)
+        check = waitResponse(wait)
+        if (check == 0) {
+            basic.pause(2000)
+            sendAT(command)
+        }
+        return check
     }
 
     // wait for certain response from ESP8266
-    function waitResponse(timeout: number = 1000): boolean {
+    function waitResponse(timeout: number = 1000): number {
         let serial_str: string = ""
-        let result: boolean = false
+        let result: number=-1
         let time: number = input.runningTime()
         while (true) {
             serial_str += serial.readString()
-			if (serial_str.includes("OK" + "\u000D\u000A")) {
-                result = true
+            if (serial_str.includes("OK" + "\u000D\u000A")) {
+                result = 2
                 break
-            } else if (serial_str.includes("ERROR" + "\u000D\u000A") || serial_str.includes("SEND FAIL"+ "\u000D\u000A")) {
+            } else if (serial_str.includes("ERROR" + "\u000D\u000A") || serial_str.includes("SEND FAIL" + "\u000D\u000A")) {
+                result = 1
+                break
+            }else if (serial_str.includes("busy p..." + "\u000D\u000A")) {
+                result = 0
                 break
             }
             if (input.runningTime() - time > timeout) {
@@ -46,73 +56,75 @@ namespace MotoduinoWiFi {
     //% rxd.defl=SerialPin.P8
     //% ssid.defl="Your_SSID"
     //% passwd.defl="Your_Password"
-	
-    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
-        bAP_Connected = false
 
+    export function Wifi_Setup(txd: SerialPin, rxd: SerialPin, ssid: string, passwd: string): void {
+        bAP_Connected = -1
         serial.redirect(txd, rxd, BaudRate.BaudRate9600)
-        sendAT("AT+RST")
-        basic.pause(3000)
-        sendAT("ATE0")
+        sendAT("AT+RST",5000)
+        while (sendAT("ATE0") < 2) basic.pause(500)
         sendAT("AT+CWMODE=1")
         basic.pause(200)
         sendAT("AT+CWDHCP=1,1")
         basic.pause(200)
-        sendAT("AT+CWJAP=\"" + ssid + "\",\"" + passwd + "\"", 0)
-        bAP_Connected =waitResponse(20000)
+        bAP_Connected =sendAT("AT+CWJAP=\"" + ssid + "\",\"" + passwd + "\"",20000)
         basic.pause(1000)
     }
-	
-	
+
+
     //% blockId=MQTT_Setup
+	//% weight=79
     //% block="MQTT Setup| server %server| clientID %client| Username %username| Password %passwd"
-	
+
     export function MQTT_Setup(server: string, client: string, username: string, passwd: string): void {
-        sendAT("AT+MQTTUSERCFG=0,1,\"" + client + "\",\"" + username + "\",\"" + passwd + "\",0,0,\"\"")
-        waitResponse()
+        sendAT("AT+MQTTUSERCFG=0,1,\"" + client + "\",\"" + username + "\",\"" + passwd + "\",0,0,\"\"",5000)
         basic.pause(1000)
-        sendAT("AT+MQTTCONN=0,\"" + server + "\",1883,0")
-        waitResponse(5000)
+        sendAT("AT+MQTTCONN=0,\"" + server + "\",1883,0",5000)
     }
-	
-	
+
+
     //% blockId=MQTT_pub
+	//% weight=78
     //% block="MQTT Publish| topic %mqtt_topic| data %data"
-	
+
     export function MQTT_pub(mqtt_topic: string, data: string): void {
         sendAT("AT+MQTTPUB=0,\"" + mqtt_topic + "\",\"" + data + "\",0,0");
     }
-	
-	
+
+
     //% blockId=MQTT_sub
+	//% weight=77
     //% block="MQTT Suscribe| topic %mqtt_topic"
-	
+
     export function MQTT_sub(mqtt_topic: string): void {
-        bMQTT_SUB=true
-        sendAT("AT+MQTTSUB=0,\"" + mqtt_topic + "\",1");
-        waitResponse(3000)
+        bMQTT_SUB = true
+        sendAT("AT+MQTTSUB=0,\"" + mqtt_topic + "\",1",3000);
         basic.pause(1000)
     }
-	
-	
+
+
     //% blockId=MQTT_Suscribe_Received
+	//% weight=76
     //% block="MQTT Suscribe $topic $message"
     //% draggableParameters
-	
+
     export function MQTT_Suscribe_Received(cb: (topic: string, message: string) => void) {
         onReceivedValueHandler = cb;
     }
-	
-	
+
+
     /**
     * Check if ESP8266 successfully connected to Wifi
     */
     //% blockId=Check_WiFiConnect
     //% weight=90
     //% block="WiFi Connected?"
-	
+
     export function Check_WiFiConnect(): boolean {
-        return bAP_Connected
+        if (bAP_Connected > 1) {
+            return true
+        } else {
+            return false
+        }
     }
 
 
@@ -122,17 +134,13 @@ namespace MotoduinoWiFi {
     //% block="ThingSpeak Data Upload| Write API Keys %apikey| Field 1 %f1|| Field 2 %f2| Field 3 %f3| Field 4 %f4| Field 5 %f5| Field 6 %f6| Field 7 %f7| Field 8 %f8"
 
     export function ThingSpeak_Uploader(apikey: string, f1: number, f2?: number, f3?: number, f4?: number, f5?: number, f6?: number, f7?: number, f8?: number): void {
-        
+
         let TSCommand = "GET /update?key=" + apikey + "&field1=" + f1 + "&field2=" + f2 + "&field3=" + f3 + "&field4=" + f4 + "&field5=" + f5 + "&field6=" + f6 + "&field7=" + f7 + "&field8=" + f8
         let ATCommand = "AT+CIPSEND=" + (TSCommand.length + 2)
-        sendAT("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(TSCommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+        sendAT("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80",5000)
+        sendAT(ATCommand,1000)
+        sendAT(TSCommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
 
 
@@ -144,14 +152,10 @@ namespace MotoduinoWiFi {
         let IFTTTCommand = "GET /trigger/" + eventName + "/with/key/" + apikey + "?value1=" + v1 + "&value2=" + v2 + "&value3=" + v3 + " HTTP/1.1\r\nHost: maker.ifttt.com\r\nConnection: close\r\n\r\n\r\n\r\n"
         let ATCommand = "AT+CIPSEND=" + (IFTTTCommand.length + 2)
 
-        sendAT("AT+CIPSTART=\"TCP\",\"maker.ifttt.com\",80")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(IFTTTCommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+        sendAT("AT+CIPSTART=\"TCP\",\"maker.ifttt.com\",80",5000)
+        sendAT(ATCommand,1000)
+        sendAT(IFTTTCommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
 
 
@@ -170,14 +174,10 @@ namespace MotoduinoWiFi {
         GoogleCommand += "&submit=Submit HTTP/1.1\r\nHost: docs.google.com\r\nConnection: close\r\n\r\n\r\n\r\n"
         */
         let ATCommand = "AT+CIPSEND=" + (GoogleCommand.length + 2)
-        sendAT("AT+CIPSTART=\"SSL\",\"docs.google.com\",443")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(GoogleCommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+        sendAT("AT+CIPSTART=\"SSL\",\"docs.google.com\",443",5000)
+        sendAT(ATCommand,1000)
+        sendAT(GoogleCommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
 
 
@@ -191,14 +191,10 @@ namespace MotoduinoWiFi {
         let SendLINECommand = "POST /api/notify HTTP/1.1\u000D\u000AHost: notify-api.line.me\u000D\u000AAuthorization: Bearer " + szToken + "\u000D\u000AContent-Type: application/x-www-form-urlencoded\u000D\u000AContent-Length: " + nMsgDataLen + "\u000D\u000A\u000D\u000A" + szMsgData + "\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (SendLINECommand.length + 2)
 
-        sendAT("AT+CIPSTART=\"SSL\",\"notify-api.line.me\",443")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(SendLINECommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+        sendAT("AT+CIPSTART=\"SSL\",\"notify-api.line.me\",443",5000)
+        sendAT(ATCommand,1000)
+        sendAT(SendLINECommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
 
 
@@ -244,14 +240,10 @@ namespace MotoduinoWiFi {
         FirebaseUploadCommand = szUploadMethod + " /" + szFirebasePath + ".json?auth=" + szFirebaseKey + " HTTP/1.1\u000D\u000AHost: " + szFirebaseURL + "\u000D\u000AContent-Length: " + nFirebaseDataLen + "\u000D\u000A\u000D\u000A" + szFirebaseData + "\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (FirebaseUploadCommand.length + 2)
 
-        sendAT("AT+CIPSTART=\"SSL\",\"" + szFirebaseURL + "\",443")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(FirebaseUploadCommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+        sendAT("AT+CIPSTART=\"SSL\",\"" + szFirebaseURL + "\",443",5000)
+        sendAT(ATCommand,1000)
+        sendAT(FirebaseUploadCommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
 
 
@@ -264,20 +256,16 @@ namespace MotoduinoWiFi {
         let nCSVDataLen: number = szCSVData.length + 2
         let MCSUploadCommand = "POST /mcs/v2/devices/" + szDeviceID + "/datapoints.csv HTTP/1.1\u000D\u000AHost: api.mediatek.com\u000D\u000AContent-Type: text/csv\u000D\u000AdeviceKey: " + szDeviceKey + "\u000D\u000AContent-Length: " + nCSVDataLen + "\u000D\u000A\u000D\u000A" + szCSVData + "\u000D\u000AConnection: close\u000D\u000A\u000D\u000A\u000D\u000A\u000D\u000A"
         let ATCommand = "AT+CIPSEND=" + (MCSUploadCommand.length + 2)
-		
-        sendAT("AT+CIPSTART=\"SSL\",\"api.mediatek.com\",443")
-        waitResponse(5000)
-        sendAT(ATCommand)
-        waitResponse(1000)
-        sendAT(MCSUploadCommand)
-        waitResponse(2000)
-        sendAT("AT+CIPCLOSE")
-        waitResponse(4000)
+
+        sendAT("AT+CIPSTART=\"SSL\",\"api.mediatek.com\",443",5000)
+        sendAT(ATCommand,1000)
+        sendAT(MCSUploadCommand,2000)
+        sendAT("AT+CIPCLOSE",4000)
     }
-	
-	
+
+
     basic.forever(function () {
-        if(bMQTT_SUB){
+        if (bMQTT_SUB) {
             mqtt_data = serial.readString()
             if (mqtt_data.length > 0) {
                 let time = input.runningTime()
@@ -290,12 +278,12 @@ namespace MotoduinoWiFi {
                         break;
                     }
                 }
-                if(mqtt_data.indexOf("MQTTSUBRECV")>0){
-                    let PUB_data = ["","",""];
+                if (mqtt_data.indexOf("MQTTSUBRECV") > 0) {
+                    let PUB_data = ["", "", ""];
                     mqtt_data = mqtt_data.substr(0, mqtt_data.length - 2)
                     PUB_data = mqtt_data.split(",")
                     PUB_data[1] = PUB_data[1].substr(1, PUB_data[1].length - 2)
-                    onReceivedValueHandler(PUB_data[1],PUB_data[3]);
+                    onReceivedValueHandler(PUB_data[1], PUB_data[3]);
                 }
             }
         }
