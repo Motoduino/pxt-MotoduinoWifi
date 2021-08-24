@@ -29,9 +29,9 @@ namespace MotoduinoWiFi {
         while (true) {
             serial_str += serial.readString()
             if (serial_str.includes("WIFI CONNECTED")) {
-		result = 3
+                result = 3
                 break
-	    } else if (serial_str.includes("OK" + "\u000D\u000A")) {
+            } else if (serial_str.includes("OK" + "\u000D\u000A")) {
                 result = 2
                 break
             } else if (serial_str.includes("ERROR" + "\u000D\u000A") || serial_str.includes("SEND FAIL" + "\u000D\u000A")) {
@@ -45,7 +45,7 @@ namespace MotoduinoWiFi {
                 break
             }
         }
-	//OLED.writeStringNewLine(serial_str)
+        //OLED.writeStringNewLine(serial_str)
         return result
     }
 
