@@ -28,7 +28,10 @@ namespace MotoduinoWiFi {
         let time: number = input.runningTime()
         while (true) {
             serial_str += serial.readString()
-            if (serial_str.includes("OK" + "\u000D\u000A")) {
+            if (serial_str.includes("WIFI CONNECTED")) {
+		result = 3
+                break
+	    } else if (serial_str.includes("OK" + "\u000D\u000A")) {
                 result = 2
                 break
             } else if (serial_str.includes("ERROR" + "\u000D\u000A") || serial_str.includes("SEND FAIL" + "\u000D\u000A")) {
@@ -42,6 +45,7 @@ namespace MotoduinoWiFi {
                 break
             }
         }
+	//OLED.writeStringNewLine(serial_str)
         return result
     }
 
@@ -66,14 +70,15 @@ namespace MotoduinoWiFi {
         basic.pause(200)
         sendAT("AT+CWDHCP=1,1")
         basic.pause(200)
-        bAP_Connected =sendAT("AT+CWJAP=\"" + ssid + "\",\"" + passwd + "\"",20000)
+        bAP_Connected = sendAT("AT+CWJAP=\"" + ssid + "\",\"" + passwd + "\"",20000)
         basic.pause(1000)
     }
 
 
     //% blockId=MQTT_Setup
-	//% weight=79
+    //% weight=79
     //% block="MQTT Setup| server %server| clientID %client| Username %username| Password %passwd"
+    //% server.defl="test.mosquitto.org"
 
     export function MQTT_Setup(server: string, client: string, username: string, passwd: string): void {
         sendAT("AT+MQTTUSERCFG=0,1,\"" + client + "\",\"" + username + "\",\"" + passwd + "\",0,0,\"\"",5000)
@@ -83,7 +88,7 @@ namespace MotoduinoWiFi {
 
 
     //% blockId=MQTT_pub
-	//% weight=78
+    //% weight=78
     //% block="MQTT Publish| topic %mqtt_topic| data %data"
 
     export function MQTT_pub(mqtt_topic: string, data: string): void {
@@ -92,7 +97,7 @@ namespace MotoduinoWiFi {
 
 
     //% blockId=MQTT_sub
-	//% weight=77
+    //% weight=77
     //% block="MQTT Suscribe| topic %mqtt_topic"
 
     export function MQTT_sub(mqtt_topic: string): void {
@@ -103,7 +108,7 @@ namespace MotoduinoWiFi {
 
 
     //% blockId=MQTT_Suscribe_Received
-	//% weight=76
+    //% weight=76
     //% block="MQTT Suscribe $topic $message"
     //% draggableParameters
 
@@ -120,7 +125,7 @@ namespace MotoduinoWiFi {
     //% block="WiFi Connected?"
 
     export function Check_WiFiConnect(): boolean {
-        if (bAP_Connected > 1) {
+        if (bAP_Connected == 3) {
             return true
         } else {
             return false
@@ -134,7 +139,6 @@ namespace MotoduinoWiFi {
     //% block="ThingSpeak Data Upload| Write API Keys %apikey| Field 1 %f1|| Field 2 %f2| Field 3 %f3| Field 4 %f4| Field 5 %f5| Field 6 %f6| Field 7 %f7| Field 8 %f8"
 
     export function ThingSpeak_Uploader(apikey: string, f1: number, f2?: number, f3?: number, f4?: number, f5?: number, f6?: number, f7?: number, f8?: number): void {
-
         let TSCommand = "GET /update?key=" + apikey + "&field1=" + f1 + "&field2=" + f2 + "&field3=" + f3 + "&field4=" + f4 + "&field5=" + f5 + "&field6=" + f6 + "&field7=" + f7 + "&field8=" + f8
         let ATCommand = "AT+CIPSEND=" + (TSCommand.length + 2)
         sendAT("AT+CIPSTART=\"TCP\",\"api.thingspeak.com\",80",5000)
@@ -245,8 +249,9 @@ namespace MotoduinoWiFi {
         sendAT(FirebaseUploadCommand,2000)
         sendAT("AT+CIPCLOSE",4000)
     }
+	
 
-
+    /*
     //% blockId=MCS_Uploader
     //% weight=25
     //% block="MCS Data Upload| Device ID %szDeviceID| Device Key %szDeviceKey| Channel Name %szDataChannelName| Data %nData"
@@ -262,6 +267,7 @@ namespace MotoduinoWiFi {
         sendAT(MCSUploadCommand,2000)
         sendAT("AT+CIPCLOSE",4000)
     }
+    */
 
 
     basic.forever(function () {
