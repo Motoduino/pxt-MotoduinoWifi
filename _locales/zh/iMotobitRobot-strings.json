@@ -1,6 +1,0 @@
-{
-    "iMotobitRobot|block": "慧手科技iMotobit",
-    "iMotobitRobot.setDCMotorSpeed|block": "DC馬達設定| %motor| 旋轉方向 %direct| 運轉速度 %nSpeed",
-    "iMotobitRobot.set2DCMotorSpeed|block": "DC馬達轉速設定| M1馬達: %nM1Speed| M2馬達 %nM2Speed",
-    "iMotobitRobot.stopDCMotor|block": "停止| %motor 馬達轉動"
-}
