@@ -1,15 +1,15 @@
 {
-    "name": "iMotobitRobot",
-    "version": "0.0.1",
-    "description": "Support Motoduino i-Motobit-Robot",
+    "name": "MotoduinoWiFi",
+    "version": "1.0.1",
+    "description": "Motoduino's WiFi Terminal Service.",
     "license": "MIT",
     "dependencies": {
         "core": "*"
     },
     "files": [
         "README.md",
-        "iMotobitRobot.ts",
-        "_locales/zh/iMotobitRobot-strings.json"
+        "main.ts",
+        "_locales/zh/MotoduinoWiFi-strings.json"
     ],
     "public": true
 }
